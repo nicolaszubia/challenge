@@ -60,8 +60,11 @@ export function ComparisonSlider({
         className="relative overflow-hidden rounded-md border border-[var(--border)] bg-[var(--canvas)]"
         style={{ width: displayWidth, height: displayHeight }}
         onPointerDown={(event) => {
+          if (event.target instanceof Element && event.target.closest("[data-issue-marker]")) {
+            return;
+          }
           dragging.current = true;
-          (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+          event.currentTarget.setPointerCapture(event.pointerId);
           setFromClientX(event.clientX, event.currentTarget);
         }}
         onPointerMove={(event) => {
@@ -90,10 +93,13 @@ export function ComparisonSlider({
           />
         </div>
         <div
-          className="absolute top-0 z-10 h-full w-px bg-white"
+          className="pointer-events-none absolute top-0 z-10 h-full w-px bg-white"
           style={{ left: `${position}%`, boxShadow: "0 0 0 1px rgba(0,0,0,0.25)" }}
         >
-          <div className="absolute top-1/2 left-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-black/15 bg-white text-[11px] text-[var(--text)] shadow-sm">
+          <div
+            data-slider-handle=""
+            className="pointer-events-auto absolute top-1/2 left-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full border border-black/15 bg-white text-[11px] text-[var(--text)] shadow-sm"
+          >
             ↔
           </div>
         </div>

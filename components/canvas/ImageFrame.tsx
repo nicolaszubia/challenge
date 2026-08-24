@@ -34,7 +34,7 @@ export function ImageFrame({
   }, [imageData]);
 
   return (
-    <figure className="min-w-0">
+    <figure className="shrink-0">
       <figcaption className="mb-2 text-[11px] font-medium tracking-[0.12em] text-[var(--text-subtle)] uppercase">
         {label}
       </figcaption>

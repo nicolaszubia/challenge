@@ -19,7 +19,7 @@ export function IssueOverlay({
 
   return (
     <svg
-      className="pointer-events-none absolute inset-0 h-full w-full"
+      className="pointer-events-none absolute inset-0 z-20 h-full w-full"
       viewBox={`0 0 ${width} ${height}`}
       role="group"
       aria-label="Accessibility issue markers"
@@ -41,10 +41,13 @@ export function IssueOverlay({
               strokeWidth={selected ? Math.max(2, width * 0.0025) : Math.max(1.5, width * 0.002)}
             />
             <a
+              data-issue-marker=""
               className="pointer-events-auto cursor-pointer"
               href={`#finding-${finding.id}`}
+              onPointerDown={(event) => event.stopPropagation()}
               onClick={(event) => {
                 event.preventDefault();
+                event.stopPropagation();
                 onSelect(finding.id);
               }}
             >

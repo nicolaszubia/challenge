@@ -25,7 +25,7 @@ export function SideBySideComparison({
   onSelect: (id: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="flex w-max min-w-full flex-col gap-4 md:flex-row md:items-start">
       <ImageFrame
         imageData={original}
         label={originalLabel}
