@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-label="Fictional Harbor Ops dashboard sample with intentional low-contrast UI">
+  <rect width="1440" height="900" fill="#F4F3EE"/>
+  <rect x="0" y="0" width="236" height="900" fill="#FFFFFF"/>
+  <rect x="236" y="0" width="1" height="900" fill="#E6E3DB"/>
+
+  <text x="28" y="42" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="700" letter-spacing="2">HARBOR</text>
+  <text x="28" y="62" fill="#A8A79E" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="500">Fleet operations</text>
+
+  <rect x="16" y="92" width="204" height="36" rx="6" fill="#E8EEFC"/>
+  <text x="32" y="115" fill="#1A44B0" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="600">Overview</text>
+  <text x="32" y="159" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="500">Routes</text>
+  <text x="32" y="195" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="500">Vessels</text>
+  <text x="32" y="231" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="500">Crew</text>
+  <text x="32" y="267" fill="#A3A094" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600">Settings</text>
+  <text x="32" y="303" fill="#B0AEA5" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="600">Integrations</text>
+
+  <text x="28" y="860" fill="#C2C0B6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="500">Internal preview</text>
+
+  <rect x="260" y="20" width="900" height="44" rx="8" fill="#FFFFFF" stroke="#E6E3DB"/>
+  <text x="280" y="48" fill="#B4B2A8" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="500">Search vessels, ports, or crews</text>
+  <text x="1328" y="48" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="600">A. Chen</text>
+
+  <text x="260" y="104" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="650">North Atlantic desk</text>
+  <text x="260" y="132" fill="#A9A79E" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="500">Tuesday, 12 August · Live operations snapshot</text>
+
+  <rect x="1228" y="86" width="188" height="44" rx="8" fill="#E6C453"/>
+  <text x="1322" y="114" fill="#FFFFFF" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">Export CSV</text>
+
+  <rect x="260" y="160" width="278" height="126" rx="10" fill="#FFFFFF" stroke="#E6E3DB"/>
+  <text x="280" y="190" fill="#A8A79E" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600">On-time rate</text>
+  <text x="280" y="236" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="36" font-weight="650">94%</text>
+  <text x="280" y="264" fill="#B0AEA5" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15">Across 128 active routes</text>
+
+  <rect x="554" y="160" width="278" height="126" rx="10" fill="#FFFFFF" stroke="#E6E3DB"/>
+  <text x="574" y="190" fill="#A8A79E" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600">Delayed departures</text>
+  <text x="574" y="236" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="36" font-weight="650">7</text>
+  <text x="574" y="264" fill="#8FCB9A" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">+2.4% vs last week</text>
+
+  <rect x="848" y="160" width="278" height="126" rx="10" fill="#FFFFFF" stroke="#E6E3DB"/>
+  <text x="868" y="190" fill="#A8A79E" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600">Fuel variance</text>
+  <text x="868" y="236" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="36" font-weight="650">12%</text>
+  <text x="868" y="264" fill="#D1A15A" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">Watch this lane</text>
+
+  <rect x="1142" y="160" width="274" height="126" rx="10" fill="#FFFFFF" stroke="#E6E3DB"/>
+  <text x="1162" y="190" fill="#A8A79E" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600">Open exceptions</text>
+  <text x="1162" y="236" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="36" font-weight="650">3</text>
+  <text x="1162" y="264" fill="#B8B6AE" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15">Needs review today</text>
+
+  <rect x="260" y="306" width="720" height="430" rx="10" fill="#FFFFFF" stroke="#E6E3DB"/>
+  <text x="280" y="338" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="650">Transit reliability</text>
+  <text x="280" y="362" fill="#B0AEA5" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Last 14 days · percent on schedule</text>
+
+  <polyline fill="none" stroke="#2155D6" stroke-width="2.5" points="300,640 360,600 420,612 480,548 540,564 600,500 660,516 720,470 780,488 840,430 900,452 960,410"/>
+  <text x="300" y="690" fill="#B8B6AE" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">1 Aug</text>
+  <text x="480" y="690" fill="#B8B6AE" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">5 Aug</text>
+  <text x="660" y="690" fill="#B8B6AE" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">9 Aug</text>
+  <text x="840" y="690" fill="#B8B6AE" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">13 Aug</text>
+  <text x="268" y="430" fill="#C2C0B6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">100</text>
+  <text x="276" y="540" fill="#C2C0B6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">80</text>
+  <text x="276" y="650" fill="#C2C0B6" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13">60</text>
+
+  <rect x="1000" y="306" width="416" height="430" rx="10" fill="#FFFFFF" stroke="#E6E3DB"/>
+  <text x="1020" y="338" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="650">Active vessels</text>
+  <text x="1020" y="362" fill="#B0AEA5" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Updated 4 minutes ago</text>
+
+  <text x="1020" y="404" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600">MV Calder</text>
+  <rect x="1288" y="386" width="104" height="26" rx="13" fill="#F3F1EC"/>
+  <text x="1340" y="404" fill="#B7B5AC" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">On time</text>
+  <text x="1020" y="426" fill="#B0AEA5" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Rotterdam ’ Halifax</text>
+
+  <text x="1020" y="474" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600">MV Sable</text>
+  <rect x="1288" y="456" width="104" height="26" rx="13" fill="#F7F0DE"/>
+  <text x="1340" y="474" fill="#C4A35A" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">Watch</text>
+  <text x="1020" y="496" fill="#B0AEA5" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Lisbon ’ Boston</text>
+
+  <text x="1020" y="544" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600">MV Keel</text>
+  <rect x="1288" y="526" width="104" height="26" rx="13" fill="#F3F1EC"/>
+  <text x="1340" y="544" fill="#B7B5AC" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">Idle</text>
+  <text x="1020" y="566" fill="#B0AEA5" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Cork ’ New York</text>
+
+  <text x="1020" y="614" fill="#1C1B18" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="600">MV Brine</text>
+  <rect x="1288" y="596" width="104" height="26" rx="13" fill="#EEF6F0"/>
+  <text x="1340" y="614" fill="#8FCB9A" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">Berthing</text>
+  <text x="1020" y="636" fill="#B0AEA5" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Oslo ’ Portland</text>
+
+  <rect x="260" y="752" width="1156" height="56" rx="8" fill="#F0EEE8"/>
+  <text x="280" y="786" fill="#B8B6AE" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="500">Secondary status messages are shown in this tone for non-blocking updates.</text>
+
+  <text x="260" y="848" fill="#C5C3BA" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">Harbor Ops is a fictional product created for Spectra demonstrations. Not a real logistics system.</text>
+</svg>
