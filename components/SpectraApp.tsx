@@ -7,7 +7,7 @@ import { Workspace } from "./Workspace";
 import { commentStorageKey, createComment, loadComments, saveComments } from "@/lib/comments/storage";
 import { enrichFindings } from "@/lib/ai/enrich";
 import { analyzeContrast } from "@/lib/contrast/analyze";
-import { copyFindings, exportAnnotatedPng, exportSimulationPng } from "@/lib/image/exportImage";
+import { copyFindings, exportAnnotatedPng, exportCommentedPng, exportSimulationPng } from "@/lib/image/exportImage";
 import { ImageLoadError } from "@/lib/image/loadImage";
 import { prepareImageFromFile, prepareImageFromUrl } from "@/lib/image/prepareImage";
 import type {
@@ -213,6 +213,11 @@ export function SpectraApp() {
     await exportAnnotatedPng(image.originalImageData, findings, selectedId, "spectra-annotated.png");
   }
 
+  async function handleExportComments() {
+    if (!image) throw new Error("missing image");
+    await exportCommentedPng(image.originalImageData, comments, "spectra-comments.png");
+  }
+
   return (
     <div className="flex h-dvh flex-col bg-[var(--bg)]">
       <a
@@ -251,6 +256,7 @@ export function SpectraApp() {
           onFilterChange={setFilter}
           onExportSimulation={handleExportSimulation}
           onExportAnnotated={handleExportAnnotated}
+          onExportComments={handleExportComments}
           onCopyFindings={() => copyFindings(findings)}
           onNewImage={handleNewImage}
           comments={comments}

@@ -1,4 +1,4 @@
-import type { AccessibilityFinding } from "@/lib/types";
+import type { AccessibilityFinding, ImageComment } from "@/lib/types";
 import { canvasToPngBlob, downloadBlob, imageDataToCanvas } from "./canvas";
 import { formatContrastRatio } from "@/lib/contrast/contrastRatio";
 
@@ -46,6 +46,115 @@ export async function exportAnnotatedPng(
 
   const blob = await canvasToPngBlob(canvas);
   downloadBlob(blob, fileName);
+}
+
+export async function exportCommentedPng(
+  imageData: ImageData,
+  comments: ImageComment[],
+  fileName: string,
+): Promise<void> {
+  const source = imageDataToCanvas(imageData);
+  const scale = Math.max(1, Math.min(imageData.width, imageData.height) / 720);
+  const pad = Math.round(24 * scale);
+  const titleSize = Math.max(16, 16 * scale);
+  const bodySize = Math.max(13, 13 * scale);
+  const lineHeight = Math.round(bodySize * 1.45);
+  const contentWidth = imageData.width - pad * 2;
+
+  const measure = document.createElement("canvas").getContext("2d");
+  if (!measure) {
+    throw new Error("Canvas is unavailable in this browser.");
+  }
+
+  const blocks = comments.map((comment, index) => {
+    const label = `C${index + 1}${comment.resolved ? " · Resolved" : ""}`;
+    const text = comment.body.trim() || "No note added.";
+    measure.font = `400 ${bodySize}px ui-sans-serif, system-ui, sans-serif`;
+    const lines = wrapText(measure, text, contentWidth);
+    return { label, lines, height: Math.round(titleSize * 1.2) + lines.length * lineHeight + pad * 0.4 };
+  });
+
+  const listHeight =
+    comments.length === 0
+      ? pad * 2 + lineHeight
+      : pad + titleSize + pad * 0.6 + blocks.reduce((sum, block) => sum + block.height, 0) + pad;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = imageData.width;
+  canvas.height = imageData.height + listHeight;
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("Canvas is unavailable in this browser.");
+  }
+
+  context.fillStyle = "#F6F5F2";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(source, 0, 0);
+
+  comments.forEach((comment, index) => {
+    const size = Math.max(18, 18 * scale);
+    const label = `C${index + 1}`;
+    const width = size + (label.length > 2 ? size * 0.45 : 0);
+    const x = comment.x - width / 2;
+    const y = comment.y - size / 2;
+    context.fillStyle = comment.resolved ? "#C4A07A" : "#C45C12";
+    roundRect(context, x, y, width, size, 4 * scale);
+    context.fill();
+    context.fillStyle = "#FFFFFF";
+    context.font = `600 ${Math.max(11, 11 * scale)}px ui-sans-serif, system-ui, sans-serif`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(label, comment.x, comment.y);
+  });
+
+  let cursorY = imageData.height + pad;
+  context.fillStyle = "#1C1B18";
+  context.font = `650 ${titleSize}px ui-sans-serif, system-ui, sans-serif`;
+  context.textAlign = "left";
+  context.textBaseline = "top";
+  context.fillText("Comments", pad, cursorY);
+  cursorY += titleSize + pad * 0.6;
+
+  if (comments.length === 0) {
+    context.fillStyle = "#6C6960";
+    context.font = `400 ${bodySize}px ui-sans-serif, system-ui, sans-serif`;
+    context.fillText("No comments on this screenshot.", pad, cursorY);
+  } else {
+    blocks.forEach((block) => {
+      context.fillStyle = "#C45C12";
+      context.font = `650 ${bodySize}px ui-sans-serif, system-ui, sans-serif`;
+      context.fillText(block.label, pad, cursorY);
+      cursorY += Math.round(titleSize * 1.2);
+      context.fillStyle = "#1C1B18";
+      context.font = `400 ${bodySize}px ui-sans-serif, system-ui, sans-serif`;
+      block.lines.forEach((line) => {
+        context.fillText(line, pad, cursorY);
+        cursorY += lineHeight;
+      });
+      cursorY += pad * 0.4;
+    });
+  }
+
+  const blob = await canvasToPngBlob(canvas);
+  downloadBlob(blob, fileName);
+}
+
+function wrapText(context: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [""];
+  const lines: string[] = [];
+  let current = words[0];
+  for (let i = 1; i < words.length; i += 1) {
+    const next = `${current} ${words[i]}`;
+    if (context.measureText(next).width <= maxWidth) {
+      current = next;
+    } else {
+      lines.push(current);
+      current = words[i];
+    }
+  }
+  lines.push(current);
+  return lines;
 }
 
 export function formatFindingsText(findings: AccessibilityFinding[]): string {

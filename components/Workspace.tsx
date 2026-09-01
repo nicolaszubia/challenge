@@ -31,6 +31,7 @@ export function Workspace({
   onFilterChange,
   onExportSimulation,
   onExportAnnotated,
+  onExportComments,
   onCopyFindings,
   onNewImage,
   comments,
@@ -66,6 +67,7 @@ export function Workspace({
   onFilterChange: (value: "all" | "high" | "medium") => void;
   onExportSimulation: () => Promise<void>;
   onExportAnnotated: () => Promise<void>;
+  onExportComments: () => Promise<void>;
   onCopyFindings: () => Promise<void>;
   onNewImage: () => void;
   comments: ImageComment[];
@@ -88,8 +90,10 @@ export function Workspace({
           <ExportMenu
             onSimulation={onExportSimulation}
             onAnnotated={onExportAnnotated}
+            onComments={onExportComments}
             onCopy={onCopyFindings}
             copyDisabled={analysisStatus !== "complete"}
+            commentsDisabled={comments.length === 0}
           />
           <button
             type="button"

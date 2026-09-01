@@ -6,13 +6,17 @@ import { ErrorMessage } from "@/components/ErrorMessage";
 export function ExportMenu({
   onSimulation,
   onAnnotated,
+  onComments,
   onCopy,
   copyDisabled,
+  commentsDisabled,
 }: {
   onSimulation: () => Promise<void>;
   onAnnotated: () => Promise<void>;
+  onComments: () => Promise<void>;
   onCopy: () => Promise<void>;
   copyDisabled: boolean;
+  commentsDisabled: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +63,9 @@ export function ExportMenu({
         >
           <MenuItem onClick={() => void run(onSimulation)}>Download simulation</MenuItem>
           <MenuItem onClick={() => void run(onAnnotated)}>Download annotated image</MenuItem>
+          <MenuItem disabled={commentsDisabled} onClick={() => void run(onComments)}>
+            Download comments image
+          </MenuItem>
           <MenuItem disabled={copyDisabled} onClick={() => void run(onCopy, true)}>
             {copied ? "Copied" : "Copy findings"}
           </MenuItem>
