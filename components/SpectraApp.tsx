@@ -4,12 +4,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { EmptyState } from "./EmptyState";
 import { Header } from "./Header";
 import { Workspace } from "./Workspace";
+import { commentStorageKey, createComment, loadComments, saveComments } from "@/lib/comments/storage";
 import { enrichFindings } from "@/lib/ai/enrich";
 import { analyzeContrast } from "@/lib/contrast/analyze";
 import { copyFindings, exportAnnotatedPng, exportSimulationPng } from "@/lib/image/exportImage";
 import { ImageLoadError } from "@/lib/image/loadImage";
 import { prepareImageFromFile, prepareImageFromUrl } from "@/lib/image/prepareImage";
-import type { AccessibilityFinding, AnalysisStatus, ComparisonMode, LoadedImage, VisionCondition } from "@/lib/types";
+import type {
+  AccessibilityFinding,
+  AnalysisStatus,
+  ComparisonMode,
+  ImageComment,
+  LoadedImage,
+  VisionCondition,
+} from "@/lib/types";
 import { getConditionMeta, simulateCondition } from "@/lib/vision/conditions";
 
 export function SpectraApp() {
@@ -30,8 +38,12 @@ export function SpectraApp() {
   const [aiNotice, setAiNotice] = useState<string | null>(null);
   const [sampleLoading, setSampleLoading] = useState(false);
   const [sampleError, setSampleError] = useState<string | null>(null);
+  const [commenting, setCommenting] = useState(false);
+  const [comments, setComments] = useState<ImageComment[]>([]);
+  const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null);
   const previousUrl = useRef<string | null>(null);
   const analysisToken = useRef(0);
+  const commentKey = useRef<string | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedIntensity(intensity), 80);
@@ -61,6 +73,11 @@ export function SpectraApp() {
     };
   }, [image, condition, debouncedIntensity]);
 
+  useEffect(() => {
+    if (!commentKey.current) return;
+    saveComments(commentKey.current, comments);
+  }, [comments]);
+
   const resetAnalysis = useCallback(() => {
     analysisToken.current += 1;
     setAnalysisStatus("idle");
@@ -80,6 +97,11 @@ export function SpectraApp() {
       setResized(wasResized);
       setSimulated(next.originalImageData);
       setProcessing(true);
+      const key = commentStorageKey(next.fileName, next.width, next.height);
+      commentKey.current = key;
+      setComments(loadComments(key));
+      setSelectedCommentId(null);
+      setCommenting(false);
       resetAnalysis();
     },
     [resetAnalysis],
@@ -122,7 +144,32 @@ export function SpectraApp() {
     setCondition("normal");
     setIntensity(100);
     setDebouncedIntensity(100);
+    commentKey.current = null;
+    setComments([]);
+    setSelectedCommentId(null);
+    setCommenting(false);
     resetAnalysis();
+  }
+
+  function handleCreateComment(x: number, y: number) {
+    const next = createComment(x, y);
+    setComments((current) => [...current, next]);
+    setSelectedCommentId(next.id);
+  }
+
+  function handleChangeComment(updated: ImageComment) {
+    setComments((current) => current.map((comment) => (comment.id === updated.id ? updated : comment)));
+  }
+
+  function handleCloseComment() {
+    setComments((current) => {
+      const selected = current.find((comment) => comment.id === selectedCommentId);
+      if (selected && selected.body.trim().length === 0) {
+        return current.filter((comment) => comment.id !== selected.id);
+      }
+      return current;
+    });
+    setSelectedCommentId(null);
   }
 
   function handleAnalyze() {
@@ -206,6 +253,14 @@ export function SpectraApp() {
           onExportAnnotated={handleExportAnnotated}
           onCopyFindings={() => copyFindings(findings)}
           onNewImage={handleNewImage}
+          comments={comments}
+          selectedCommentId={selectedCommentId}
+          commenting={commenting}
+          onToggleCommenting={() => setCommenting((value) => !value)}
+          onSelectComment={setSelectedCommentId}
+          onCreateComment={handleCreateComment}
+          onChangeComment={handleChangeComment}
+          onCloseComment={handleCloseComment}
         />
       ) : (
         <EmptyState

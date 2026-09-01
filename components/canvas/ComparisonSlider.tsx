@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { AccessibilityFinding } from "@/lib/types";
+import { CommentOverlay } from "@/components/comments/CommentOverlay";
+import type { AccessibilityFinding, ImageComment } from "@/lib/types";
 import { IssueOverlay } from "./IssueOverlay";
 
 export function ComparisonSlider({
@@ -16,6 +17,13 @@ export function ComparisonSlider({
   findings,
   selectedId,
   onSelect,
+  comments,
+  selectedCommentId,
+  commenting,
+  onSelectComment,
+  onCreateComment,
+  onChangeComment,
+  onCloseComment,
 }: {
   original: ImageData;
   simulated: ImageData;
@@ -28,6 +36,13 @@ export function ComparisonSlider({
   findings: AccessibilityFinding[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  comments: ImageComment[];
+  selectedCommentId: string | null;
+  commenting: boolean;
+  onSelectComment: (id: string) => void;
+  onCreateComment: (x: number, y: number) => void;
+  onChangeComment: (next: ImageComment) => void;
+  onCloseComment: () => void;
 }) {
   const originalRef = useRef<HTMLCanvasElement>(null);
   const simulatedRef = useRef<HTMLCanvasElement>(null);
@@ -57,10 +72,13 @@ export function ComparisonSlider({
         <span>{simulatedLabel}</span>
       </div>
       <div
-        className="relative overflow-hidden rounded-md border border-[var(--border)] bg-[var(--canvas)]"
+        className="relative overflow-visible rounded-md border border-[var(--border)] bg-[var(--canvas)]"
         style={{ width: displayWidth, height: displayHeight }}
         onPointerDown={(event) => {
-          if (event.target instanceof Element && event.target.closest("[data-issue-marker]")) {
+          if (
+            event.target instanceof Element &&
+            event.target.closest("[data-issue-marker], [data-comment-marker], [data-comment-layer]")
+          ) {
             return;
           }
           dragging.current = true;
@@ -110,6 +128,20 @@ export function ComparisonSlider({
           selectedId={selectedId}
           onSelect={onSelect}
         />
+        {commenting || comments.length > 0 ? (
+          <CommentOverlay
+            imageWidth={original.width}
+            imageHeight={original.height}
+            comments={comments}
+            selectedId={selectedCommentId}
+            commenting={commenting}
+            showPopover
+            onSelect={onSelectComment}
+            onCreate={onCreateComment}
+            onChange={onChangeComment}
+            onClose={onCloseComment}
+          />
+        ) : null}
       </div>
       <label className="sr-only" htmlFor="comparison-position">
         Comparison position

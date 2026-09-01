@@ -4,7 +4,7 @@ import { ExportMenu } from "./ExportMenu";
 import { ImageStage } from "./canvas/ImageStage";
 import { FindingsPanel } from "./findings/FindingsPanel";
 import { SimulationPanel } from "./simulation/SimulationPanel";
-import type { AccessibilityFinding, AnalysisStatus, ComparisonMode, VisionCondition } from "@/lib/types";
+import type { AccessibilityFinding, AnalysisStatus, ComparisonMode, ImageComment, VisionCondition } from "@/lib/types";
 
 export function Workspace({
   fileName,
@@ -33,6 +33,14 @@ export function Workspace({
   onExportAnnotated,
   onCopyFindings,
   onNewImage,
+  comments,
+  selectedCommentId,
+  commenting,
+  onToggleCommenting,
+  onSelectComment,
+  onCreateComment,
+  onChangeComment,
+  onCloseComment,
 }: {
   fileName: string;
   resized: boolean;
@@ -60,6 +68,14 @@ export function Workspace({
   onExportAnnotated: () => Promise<void>;
   onCopyFindings: () => Promise<void>;
   onNewImage: () => void;
+  comments: ImageComment[];
+  selectedCommentId: string | null;
+  commenting: boolean;
+  onToggleCommenting: () => void;
+  onSelectComment: (id: string) => void;
+  onCreateComment: (x: number, y: number) => void;
+  onChangeComment: (next: ImageComment) => void;
+  onCloseComment: () => void;
 }) {
   return (
     <main id="main" className="flex min-h-0 flex-1 flex-col">
@@ -75,6 +91,18 @@ export function Workspace({
             onCopy={onCopyFindings}
             copyDisabled={analysisStatus !== "complete"}
           />
+          <button
+            type="button"
+            aria-pressed={commenting}
+            className={`inline-flex h-8 items-center rounded-md border px-2.5 text-[12px] font-medium ${
+              commenting
+                ? "border-[var(--comment)] bg-[var(--comment-soft)] text-[var(--comment)]"
+                : "border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
+            }`}
+            onClick={onToggleCommenting}
+          >
+            Add comments
+          </button>
           <button
             type="button"
             className="inline-flex h-8 items-center rounded-md px-2.5 text-[12px] font-medium text-[var(--text-muted)] hover:bg-[color-mix(in_srgb,var(--text)_5%,transparent)] hover:text-[var(--text)]"
@@ -106,6 +134,13 @@ export function Workspace({
           findings={analysisStatus === "complete" ? findings : []}
           selectedId={selectedId}
           onSelect={onSelectFinding}
+          comments={comments}
+          selectedCommentId={selectedCommentId}
+          commenting={commenting}
+          onSelectComment={onSelectComment}
+          onCreateComment={onCreateComment}
+          onChangeComment={onChangeComment}
+          onCloseComment={onCloseComment}
         />
         <div className="min-h-[320px] lg:min-h-0">
           <FindingsPanel

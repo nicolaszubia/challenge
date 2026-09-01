@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { AccessibilityFinding } from "@/lib/types";
+import { CommentOverlay } from "@/components/comments/CommentOverlay";
+import type { AccessibilityFinding, ImageComment } from "@/lib/types";
 import { IssueOverlay } from "./IssueOverlay";
 
 export function ImageFrame({
@@ -12,6 +13,14 @@ export function ImageFrame({
   onSelect,
   width,
   height,
+  comments,
+  selectedCommentId,
+  commenting,
+  showCommentPopover,
+  onSelectComment,
+  onCreateComment,
+  onChangeComment,
+  onCloseComment,
 }: {
   imageData: ImageData;
   label: string;
@@ -20,6 +29,14 @@ export function ImageFrame({
   onSelect: (id: string) => void;
   width: number;
   height: number;
+  comments: ImageComment[];
+  selectedCommentId: string | null;
+  commenting: boolean;
+  showCommentPopover: boolean;
+  onSelectComment: (id: string) => void;
+  onCreateComment: (x: number, y: number) => void;
+  onChangeComment: (next: ImageComment) => void;
+  onCloseComment: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -38,20 +55,36 @@ export function ImageFrame({
       <figcaption className="mb-2 text-[11px] font-medium tracking-[0.12em] text-[var(--text-subtle)] uppercase">
         {label}
       </figcaption>
-      <div className="relative overflow-hidden rounded-md border border-[var(--border)] bg-[var(--canvas)]" style={{ width, height }}>
-        <canvas
-          ref={canvasRef}
-          className="block h-full w-full"
-          style={{ width, height }}
-          aria-label={`${label} screenshot`}
-        />
-        <IssueOverlay
-          width={imageData.width}
-          height={imageData.height}
-          findings={findings}
-          selectedId={selectedId}
-          onSelect={onSelect}
-        />
+      <div className="relative" style={{ width, height }}>
+        <div className="relative h-full w-full overflow-hidden rounded-md border border-[var(--border)] bg-[var(--canvas)]">
+          <canvas
+            ref={canvasRef}
+            className="block h-full w-full"
+            style={{ width, height }}
+            aria-label={`${label} screenshot`}
+          />
+          <IssueOverlay
+            width={imageData.width}
+            height={imageData.height}
+            findings={findings}
+            selectedId={selectedId}
+            onSelect={onSelect}
+          />
+        </div>
+        {commenting || comments.length > 0 ? (
+          <CommentOverlay
+            imageWidth={imageData.width}
+            imageHeight={imageData.height}
+            comments={comments}
+            selectedId={selectedCommentId}
+            commenting={commenting}
+            showPopover={showCommentPopover}
+            onSelect={onSelectComment}
+            onCreate={onCreateComment}
+            onChange={onChangeComment}
+            onClose={onCloseComment}
+          />
+        ) : null}
       </div>
     </figure>
   );

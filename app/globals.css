@@ -14,6 +14,9 @@
   --danger: #b42318;
   --danger-soft: #fdecec;
   --warning: #b54708;
+  --comment: #c45c12;
+  --comment-hover: #9a430a;
+  --comment-soft: #fff1e4;
   --canvas: #ece9e2;
   --header-h: 52px;
   --focus: #2155d6;
@@ -34,6 +37,9 @@
     --danger: #f97066;
     --danger-soft: #3a1d1b;
     --warning: #f7b27a;
+    --comment: #f0a15a;
+    --comment-hover: #f6b97c;
+    --comment-soft: #3a2818;
     --canvas: #0e0e0d;
     --focus: #7b95f7;
   }

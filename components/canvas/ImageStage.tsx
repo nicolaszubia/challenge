@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { AccessibilityFinding, ComparisonMode, VisionCondition } from "@/lib/types";
+import type { AccessibilityFinding, ComparisonMode, ImageComment, VisionCondition } from "@/lib/types";
 import { getConditionMeta } from "@/lib/vision/conditions";
 import { ComparisonModeToggle } from "./ComparisonModeToggle";
 import { ComparisonSlider } from "./ComparisonSlider";
@@ -21,6 +21,13 @@ export function ImageStage({
   findings,
   selectedId,
   onSelect,
+  comments,
+  selectedCommentId,
+  commenting,
+  onSelectComment,
+  onCreateComment,
+  onChangeComment,
+  onCloseComment,
 }: {
   original: ImageData;
   simulated: ImageData;
@@ -32,6 +39,13 @@ export function ImageStage({
   findings: AccessibilityFinding[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  comments: ImageComment[];
+  selectedCommentId: string | null;
+  commenting: boolean;
+  onSelectComment: (id: string) => void;
+  onCreateComment: (x: number, y: number) => void;
+  onChangeComment: (next: ImageComment) => void;
+  onCloseComment: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [container, setContainer] = useState({ width: 0, height: 0 });
@@ -64,6 +78,9 @@ export function ImageStage({
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border)] px-3 py-2">
         <ComparisonModeToggle value={comparisonMode} onChange={onComparisonModeChange} />
+        {commenting ? (
+          <p className="text-[12px] text-[var(--comment)]">Click the image to add an orange comment pin.</p>
+        ) : null}
         <ZoomControls
           zoomLabel={zoomMode === "fit" ? "Fit" : `${Math.round(numericZoom * 100)}%`}
           onFit={() => setZoomMode("fit")}
@@ -93,6 +110,13 @@ export function ImageStage({
               findings={findings}
               selectedId={selectedId}
               onSelect={onSelect}
+              comments={comments}
+              selectedCommentId={selectedCommentId}
+              commenting={commenting}
+              onSelectComment={onSelectComment}
+              onCreateComment={onCreateComment}
+              onChangeComment={onChangeComment}
+              onCloseComment={onCloseComment}
             />
           ) : (
             <ComparisonSlider
@@ -107,6 +131,13 @@ export function ImageStage({
               findings={findings}
               selectedId={selectedId}
               onSelect={onSelect}
+              comments={comments}
+              selectedCommentId={selectedCommentId}
+              commenting={commenting}
+              onSelectComment={onSelectComment}
+              onCreateComment={onCreateComment}
+              onChangeComment={onChangeComment}
+              onCloseComment={onCloseComment}
             />
           )
         ) : null}

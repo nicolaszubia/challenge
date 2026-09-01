@@ -1,6 +1,6 @@
 "use client";
 
-import type { AccessibilityFinding } from "@/lib/types";
+import type { AccessibilityFinding, ImageComment } from "@/lib/types";
 import { ImageFrame } from "./ImageFrame";
 
 export function SideBySideComparison({
@@ -13,6 +13,13 @@ export function SideBySideComparison({
   findings,
   selectedId,
   onSelect,
+  comments,
+  selectedCommentId,
+  commenting,
+  onSelectComment,
+  onCreateComment,
+  onChangeComment,
+  onCloseComment,
 }: {
   original: ImageData;
   simulated: ImageData;
@@ -23,26 +30,42 @@ export function SideBySideComparison({
   findings: AccessibilityFinding[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  comments: ImageComment[];
+  selectedCommentId: string | null;
+  commenting: boolean;
+  onSelectComment: (id: string) => void;
+  onCreateComment: (x: number, y: number) => void;
+  onChangeComment: (next: ImageComment) => void;
+  onCloseComment: () => void;
 }) {
+  const shared = {
+    width: displayWidth,
+    height: displayHeight,
+    findings,
+    selectedId,
+    onSelect,
+    comments,
+    selectedCommentId,
+    commenting,
+    onSelectComment,
+    onCreateComment,
+    onChangeComment,
+    onCloseComment,
+  };
+
   return (
     <div className="flex w-max min-w-full flex-col gap-4 md:flex-row md:items-start">
       <ImageFrame
         imageData={original}
         label={originalLabel}
-        width={displayWidth}
-        height={displayHeight}
-        findings={findings}
-        selectedId={selectedId}
-        onSelect={onSelect}
+        showCommentPopover
+        {...shared}
       />
       <ImageFrame
         imageData={simulated}
         label={simulatedLabel}
-        width={displayWidth}
-        height={displayHeight}
-        findings={findings}
-        selectedId={selectedId}
-        onSelect={onSelect}
+        showCommentPopover={false}
+        {...shared}
       />
     </div>
   );

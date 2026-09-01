@@ -44,6 +44,16 @@ export type AccessibilityFinding = {
   source: "deterministic" | "ai";
 };
 
+export type ImageComment = {
+  id: string;
+  x: number;
+  y: number;
+  body: string;
+  resolved: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type LoadedImage = {
   element: HTMLImageElement;
   objectUrl: string;

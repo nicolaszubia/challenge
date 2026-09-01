@@ -1,0 +1,104 @@
+"use client";
+
+import { useEffect, useId, useRef } from "react";
+import type { ImageComment } from "@/lib/types";
+
+export function CommentPopover({
+  comment,
+  index,
+  imageWidth,
+  imageHeight,
+  onChange,
+  onClose,
+}: {
+  comment: ImageComment;
+  index: number;
+  imageWidth: number;
+  imageHeight: number;
+  onChange: (next: ImageComment) => void;
+  onClose: () => void;
+}) {
+  const labelId = useId();
+  const areaRef = useRef<HTMLTextAreaElement>(null);
+  const left = (comment.x / imageWidth) * 100;
+  const top = (comment.y / imageHeight) * 100;
+  const alignRight = left > 62;
+
+  useEffect(() => {
+    areaRef.current?.focus();
+  }, [comment.id]);
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      data-comment-marker=""
+      className="absolute z-30 w-[220px] rounded-md border border-[color-mix(in_srgb,var(--comment)_35%,var(--border))] bg-[var(--surface)] shadow-sm"
+      style={{
+        left: `${left}%`,
+        top: `${top}%`,
+        transform: alignRight ? "translate(-100%, 12px)" : "translate(12px, 12px)",
+      }}
+      role="dialog"
+      aria-labelledby={labelId}
+      onPointerDown={(event) => event.stopPropagation()}
+    >
+      <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] px-2.5 py-1.5">
+        <p id={labelId} className="text-[11px] font-semibold tracking-[0.08em] text-[var(--comment)] uppercase">
+          Comment {String(index + 1).padStart(2, "0")}
+          {comment.resolved ? " · Resolved" : ""}
+        </p>
+        <button
+          type="button"
+          className="inline-flex h-6 w-6 items-center justify-center rounded text-[14px] text-[var(--text-muted)] hover:bg-[color-mix(in_srgb,var(--text)_6%,transparent)] hover:text-[var(--text)]"
+          aria-label="Close comment"
+          onClick={onClose}
+        >
+          ×
+        </button>
+      </div>
+      <div className="p-2.5">
+        <label className="sr-only" htmlFor={`${labelId}-body`}>
+          Comment text
+        </label>
+        <textarea
+          id={`${labelId}-body`}
+          ref={areaRef}
+          rows={3}
+          value={comment.body}
+          placeholder="Add a note about this area…"
+          className="w-full resize-none rounded border border-[var(--border)] bg-[var(--bg)] px-2 py-1.5 text-[12px] leading-5 text-[var(--text)] outline-none focus-visible:border-[var(--comment)]"
+          onChange={(event) =>
+            onChange({
+              ...comment,
+              body: event.target.value,
+              updatedAt: new Date().toISOString(),
+            })
+          }
+        />
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            className="inline-flex h-7 items-center rounded px-2 text-[12px] font-medium text-[var(--comment)] hover:bg-[var(--comment-soft)]"
+            onClick={() =>
+              onChange({
+                ...comment,
+                resolved: !comment.resolved,
+                updatedAt: new Date().toISOString(),
+              })
+            }
+          >
+            {comment.resolved ? "Reopen" : "Mark resolved"}
+          </button>
+          <p className="text-[10px] text-[var(--text-subtle)]">Saved locally</p>
+        </div>
+      </div>
+    </div>
+  );
+}
