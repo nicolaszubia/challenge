@@ -19,9 +19,23 @@ export function loadComments(key: string): ImageComment[] {
   }
 }
 
+export function persistableComments(comments: ImageComment[]): ImageComment[] {
+  return comments
+    .filter((comment) => !comment.draft && comment.body.trim().length > 0)
+    .map((comment) => ({
+      id: comment.id,
+      x: comment.x,
+      y: comment.y,
+      body: comment.body,
+      resolved: comment.resolved,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+    }));
+}
+
 export function saveComments(key: string, comments: ImageComment[]): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(key, JSON.stringify(comments));
+  window.localStorage.setItem(key, JSON.stringify(persistableComments(comments)));
 }
 
 export function createComment(x: number, y: number): ImageComment {
@@ -32,6 +46,7 @@ export function createComment(x: number, y: number): ImageComment {
     y,
     body: "",
     resolved: false,
+    draft: true,
     createdAt: now,
     updatedAt: now,
   };

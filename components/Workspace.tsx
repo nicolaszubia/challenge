@@ -4,7 +4,7 @@ import { ExportMenu } from "./ExportMenu";
 import { ImageStage } from "./canvas/ImageStage";
 import { FindingsPanel } from "./findings/FindingsPanel";
 import { SimulationPanel } from "./simulation/SimulationPanel";
-import type { AccessibilityFinding, AnalysisStatus, ComparisonMode, ImageComment, VisionCondition } from "@/lib/types";
+import type { AccessibilityFinding, AnalysisStatus, ImageComment, RightPanelTab, VisionCondition } from "@/lib/types";
 
 export function Workspace({
   fileName,
@@ -15,7 +15,6 @@ export function Workspace({
   intensity,
   processing,
   processError,
-  comparisonMode,
   sliderPosition,
   analysisStatus,
   findings,
@@ -24,7 +23,6 @@ export function Workspace({
   aiNotice,
   onConditionChange,
   onIntensityChange,
-  onComparisonModeChange,
   onSliderPositionChange,
   onAnalyze,
   onSelectFinding,
@@ -41,7 +39,10 @@ export function Workspace({
   onSelectComment,
   onCreateComment,
   onChangeComment,
+  onSaveComment,
   onCloseComment,
+  rightTab,
+  onRightTabChange,
 }: {
   fileName: string;
   resized: boolean;
@@ -51,7 +52,6 @@ export function Workspace({
   intensity: number;
   processing: boolean;
   processError: string | null;
-  comparisonMode: ComparisonMode;
   sliderPosition: number;
   analysisStatus: AnalysisStatus;
   findings: AccessibilityFinding[];
@@ -60,7 +60,6 @@ export function Workspace({
   aiNotice: string | null;
   onConditionChange: (value: VisionCondition) => void;
   onIntensityChange: (value: number) => void;
-  onComparisonModeChange: (value: ComparisonMode) => void;
   onSliderPositionChange: (value: number) => void;
   onAnalyze: () => void;
   onSelectFinding: (id: string) => void;
@@ -77,7 +76,10 @@ export function Workspace({
   onSelectComment: (id: string) => void;
   onCreateComment: (x: number, y: number) => void;
   onChangeComment: (next: ImageComment) => void;
+  onSaveComment: (next: ImageComment) => void;
   onCloseComment: () => void;
+  rightTab: RightPanelTab;
+  onRightTabChange: (tab: RightPanelTab) => void;
 }) {
   return (
     <main id="main" className="flex min-h-0 flex-1 flex-col">
@@ -93,7 +95,7 @@ export function Workspace({
             onComments={onExportComments}
             onCopy={onCopyFindings}
             copyDisabled={analysisStatus !== "complete"}
-            commentsDisabled={comments.length === 0}
+            commentsDisabled={comments.filter((comment) => !comment.draft && comment.body.trim()).length === 0}
           />
           <button
             type="button"
@@ -131,8 +133,6 @@ export function Workspace({
           original={original}
           simulated={simulated}
           condition={condition}
-          comparisonMode={comparisonMode}
-          onComparisonModeChange={onComparisonModeChange}
           sliderPosition={sliderPosition}
           onSliderPositionChange={onSliderPositionChange}
           findings={analysisStatus === "complete" ? findings : []}
@@ -144,6 +144,7 @@ export function Workspace({
           onSelectComment={onSelectComment}
           onCreateComment={onCreateComment}
           onChangeComment={onChangeComment}
+          onSaveComment={onSaveComment}
           onCloseComment={onCloseComment}
         />
         <div className="min-h-[320px] lg:min-h-0">
@@ -157,6 +158,11 @@ export function Workspace({
             aiNotice={aiNotice}
             onAnalyze={onAnalyze}
             analyzing={analysisStatus === "analyzing"}
+            tab={rightTab}
+            onTabChange={onRightTabChange}
+            comments={comments}
+            selectedCommentId={selectedCommentId}
+            onSelectComment={onSelectComment}
           />
         </div>
       </div>

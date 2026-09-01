@@ -11,8 +11,8 @@ export function CommentOverlay({
   commenting,
   showPopover,
   onSelect,
-  onCreate,
   onChange,
+  onSave,
   onClose,
 }: {
   imageWidth: number;
@@ -22,43 +22,22 @@ export function CommentOverlay({
   commenting: boolean;
   showPopover: boolean;
   onSelect: (id: string) => void;
-  onCreate: (x: number, y: number) => void;
   onChange: (next: ImageComment) => void;
+  onSave: (next: ImageComment) => void;
   onClose: () => void;
 }) {
   const selected = comments.find((comment) => comment.id === selectedId) ?? null;
   const selectedIndex = selected ? comments.indexOf(selected) : -1;
   const markerSize = Math.max(18, Math.min(imageWidth, imageHeight) * 0.028);
 
-  function pointFromEvent(event: React.MouseEvent<HTMLElement>): { x: number; y: number } {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * imageWidth;
-    const y = ((event.clientY - rect.top) / rect.height) * imageHeight;
-    return {
-      x: Math.min(imageWidth, Math.max(0, x)),
-      y: Math.min(imageHeight, Math.max(0, y)),
-    };
-  }
-
   return (
-    <div className="absolute inset-0 z-[25]">
+    <div className="pointer-events-none absolute inset-0 z-[25]">
       {commenting ? (
-        <button
-          type="button"
-          data-comment-layer=""
-          className="absolute inset-0 cursor-crosshair border-0 bg-[rgba(33,85,214,0.12)] p-0"
-          aria-label="Click to add a comment"
-          onPointerDown={(event) => event.stopPropagation()}
-          onClick={(event) => {
-            if ((event.target as Element | null)?.closest?.("[data-comment-marker]")) return;
-            const point = pointFromEvent(event);
-            onCreate(point.x, point.y);
-          }}
-        />
+        <div className="absolute inset-0 bg-[rgba(33,85,214,0.12)]" aria-hidden="true" />
       ) : null}
 
       <svg
-        className="pointer-events-none absolute inset-0 h-full w-full"
+        className="absolute inset-0 h-full w-full"
         viewBox={`0 0 ${imageWidth} ${imageHeight}`}
         role="group"
         aria-label="Image comments"
@@ -115,14 +94,18 @@ export function CommentOverlay({
       </svg>
 
       {showPopover && selected && selectedIndex >= 0 ? (
-        <CommentPopover
-          comment={selected}
-          index={selectedIndex}
-          imageWidth={imageWidth}
-          imageHeight={imageHeight}
-          onChange={onChange}
-          onClose={onClose}
-        />
+        <div className="pointer-events-auto">
+          <CommentPopover
+            key={selected.id}
+            comment={selected}
+            index={selectedIndex}
+            imageWidth={imageWidth}
+            imageHeight={imageHeight}
+            onChange={onChange}
+            onSave={onSave}
+            onClose={onClose}
+          />
+        </div>
       ) : null}
     </div>
   );

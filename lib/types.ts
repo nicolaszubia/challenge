@@ -50,9 +50,12 @@ export type ImageComment = {
   y: number;
   body: string;
   resolved: boolean;
+  draft?: boolean;
   createdAt: string;
   updatedAt: string;
 };
+
+export type RightPanelTab = "findings" | "comments";
 
 export type LoadedImage = {
   element: HTMLImageElement;

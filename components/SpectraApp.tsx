@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { EmptyState } from "./EmptyState";
 import { Header } from "./Header";
 import { Workspace } from "./Workspace";
-import { commentStorageKey, createComment, loadComments, saveComments } from "@/lib/comments/storage";
+import { commentStorageKey, createComment, loadComments, persistableComments, saveComments } from "@/lib/comments/storage";
 import { enrichFindings } from "@/lib/ai/enrich";
 import { analyzeContrast } from "@/lib/contrast/analyze";
 import { copyFindings, exportAnnotatedPng, exportCommentedPng, exportSimulationPng } from "@/lib/image/exportImage";
@@ -13,9 +13,9 @@ import { prepareImageFromFile, prepareImageFromUrl } from "@/lib/image/prepareIm
 import type {
   AccessibilityFinding,
   AnalysisStatus,
-  ComparisonMode,
   ImageComment,
   LoadedImage,
+  RightPanelTab,
   VisionCondition,
 } from "@/lib/types";
 import { getConditionMeta, simulateCondition } from "@/lib/vision/conditions";
@@ -29,7 +29,6 @@ export function SpectraApp() {
   const [simulated, setSimulated] = useState<ImageData | null>(null);
   const [processing, setProcessing] = useState(false);
   const [processError, setProcessError] = useState<string | null>(null);
-  const [comparisonMode, setComparisonMode] = useState<ComparisonMode>("side-by-side");
   const [sliderPosition, setSliderPosition] = useState(50);
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>("idle");
   const [findings, setFindings] = useState<AccessibilityFinding[]>([]);
@@ -41,6 +40,7 @@ export function SpectraApp() {
   const [commenting, setCommenting] = useState(false);
   const [comments, setComments] = useState<ImageComment[]>([]);
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null);
+  const [rightTab, setRightTab] = useState<RightPanelTab>("findings");
   const previousUrl = useRef<string | null>(null);
   const analysisToken = useRef(0);
   const commentKey = useRef<string | null>(null);
@@ -102,6 +102,7 @@ export function SpectraApp() {
       setComments(loadComments(key));
       setSelectedCommentId(null);
       setCommenting(false);
+      setRightTab("findings");
       resetAnalysis();
     },
     [resetAnalysis],
@@ -148,12 +149,13 @@ export function SpectraApp() {
     setComments([]);
     setSelectedCommentId(null);
     setCommenting(false);
+    setRightTab("findings");
     resetAnalysis();
   }
 
   function handleCreateComment(x: number, y: number) {
     const next = createComment(x, y);
-    setComments((current) => [...current, next]);
+    setComments((current) => [...current.filter((comment) => !comment.draft), next]);
     setSelectedCommentId(next.id);
   }
 
@@ -161,14 +163,22 @@ export function SpectraApp() {
     setComments((current) => current.map((comment) => (comment.id === updated.id ? updated : comment)));
   }
 
+  function handleSaveComment(updated: ImageComment) {
+    if (updated.body.trim().length === 0) {
+      setComments((current) => current.filter((comment) => comment.id !== updated.id));
+      setSelectedCommentId(null);
+      return;
+    }
+    setComments((current) =>
+      current.map((comment) => (comment.id === updated.id ? { ...updated, draft: false } : comment)),
+    );
+    setRightTab("comments");
+  }
+
   function handleCloseComment() {
-    setComments((current) => {
-      const selected = current.find((comment) => comment.id === selectedCommentId);
-      if (selected && selected.body.trim().length === 0) {
-        return current.filter((comment) => comment.id !== selected.id);
-      }
-      return current;
-    });
+    setComments((current) =>
+      current.filter((comment) => !(comment.id === selectedCommentId && (comment.draft || comment.body.trim().length === 0))),
+    );
     setSelectedCommentId(null);
   }
 
@@ -215,7 +225,7 @@ export function SpectraApp() {
 
   async function handleExportComments() {
     if (!image) throw new Error("missing image");
-    await exportCommentedPng(image.originalImageData, comments, "spectra-comments.png");
+    await exportCommentedPng(image.originalImageData, persistableComments(comments), "spectra-comments.png");
   }
 
   return (
@@ -237,7 +247,6 @@ export function SpectraApp() {
           intensity={intensity}
           processing={processing}
           processError={processError}
-          comparisonMode={comparisonMode}
           sliderPosition={sliderPosition}
           analysisStatus={analysisStatus}
           findings={findings}
@@ -249,7 +258,6 @@ export function SpectraApp() {
             setIntensity(value);
             setProcessing(true);
           }}
-          onComparisonModeChange={setComparisonMode}
           onSliderPositionChange={setSliderPosition}
           onAnalyze={handleAnalyze}
           onSelectFinding={setSelectedId}
@@ -262,11 +270,17 @@ export function SpectraApp() {
           comments={comments}
           selectedCommentId={selectedCommentId}
           commenting={commenting}
-          onToggleCommenting={() => setCommenting((value) => !value)}
+          onToggleCommenting={() => {
+            setCommenting((value) => !value);
+            handleCloseComment();
+          }}
           onSelectComment={setSelectedCommentId}
           onCreateComment={handleCreateComment}
           onChangeComment={handleChangeComment}
+          onSaveComment={handleSaveComment}
           onCloseComment={handleCloseComment}
+          rightTab={rightTab}
+          onRightTabChange={setRightTab}
         />
       ) : (
         <EmptyState

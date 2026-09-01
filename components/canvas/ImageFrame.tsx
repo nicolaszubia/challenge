@@ -18,8 +18,8 @@ export function ImageFrame({
   commenting,
   showCommentPopover,
   onSelectComment,
-  onCreateComment,
   onChangeComment,
+  onSaveComment,
   onCloseComment,
 }: {
   imageData: ImageData;
@@ -34,8 +34,8 @@ export function ImageFrame({
   commenting: boolean;
   showCommentPopover: boolean;
   onSelectComment: (id: string) => void;
-  onCreateComment: (x: number, y: number) => void;
   onChangeComment: (next: ImageComment) => void;
+  onSaveComment: (next: ImageComment) => void;
   onCloseComment: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -80,8 +80,8 @@ export function ImageFrame({
             commenting={commenting}
             showPopover={showCommentPopover}
             onSelect={onSelectComment}
-            onCreate={onCreateComment}
             onChange={onChangeComment}
+            onSave={onSaveComment}
             onClose={onCloseComment}
           />
         ) : null}

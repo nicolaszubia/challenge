@@ -23,6 +23,7 @@ export function ComparisonSlider({
   onSelectComment,
   onCreateComment,
   onChangeComment,
+  onSaveComment,
   onCloseComment,
 }: {
   original: ImageData;
@@ -42,11 +43,14 @@ export function ComparisonSlider({
   onSelectComment: (id: string) => void;
   onCreateComment: (x: number, y: number) => void;
   onChangeComment: (next: ImageComment) => void;
+  onSaveComment: (next: ImageComment) => void;
   onCloseComment: () => void;
 }) {
   const originalRef = useRef<HTMLCanvasElement>(null);
   const simulatedRef = useRef<HTMLCanvasElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
+  const pointer = useRef({ x: 0, moved: false, fromHandle: false });
 
   useEffect(() => {
     const paint = (canvas: HTMLCanvasElement | null, data: ImageData) => {
@@ -65,6 +69,16 @@ export function ComparisonSlider({
     onPositionChange(Math.min(100, Math.max(0, next)));
   }
 
+  function imagePoint(clientX: number, clientY: number): { x: number; y: number } | null {
+    const frame = frameRef.current;
+    if (!frame) return null;
+    const rect = frame.getBoundingClientRect();
+    return {
+      x: Math.min(original.width, Math.max(0, ((clientX - rect.left) / rect.width) * original.width)),
+      y: Math.min(original.height, Math.max(0, ((clientY - rect.top) / rect.height) * original.height)),
+    };
+  }
+
   return (
     <div>
       <div className="mb-2 flex justify-between text-[11px] font-medium tracking-[0.12em] text-[var(--text-subtle)] uppercase">
@@ -72,24 +86,41 @@ export function ComparisonSlider({
         <span>{simulatedLabel}</span>
       </div>
       <div
+        ref={frameRef}
         className="relative overflow-visible rounded-md border border-[var(--border)] bg-[var(--canvas)]"
         style={{ width: displayWidth, height: displayHeight }}
         onPointerDown={(event) => {
           if (
             event.target instanceof Element &&
-            event.target.closest("[data-issue-marker], [data-comment-marker], [data-comment-layer]")
+            event.target.closest("[data-issue-marker], [data-comment-marker]")
           ) {
             return;
           }
+          const fromHandle = event.target instanceof Element && Boolean(event.target.closest("[data-slider-handle]"));
           dragging.current = true;
+          pointer.current = { x: event.clientX, moved: false, fromHandle };
           event.currentTarget.setPointerCapture(event.pointerId);
-          setFromClientX(event.clientX, event.currentTarget);
+          if (fromHandle || !commenting) {
+            setFromClientX(event.clientX, event.currentTarget);
+          }
         }}
         onPointerMove={(event) => {
           if (!dragging.current) return;
-          setFromClientX(event.clientX, event.currentTarget);
+          if (Math.abs(event.clientX - pointer.current.x) > 4) pointer.current.moved = true;
+          if (pointer.current.fromHandle || !commenting || pointer.current.moved) {
+            setFromClientX(event.clientX, event.currentTarget);
+          }
         }}
-        onPointerUp={() => {
+        onPointerUp={(event) => {
+          if (
+            dragging.current &&
+            commenting &&
+            !pointer.current.moved &&
+            !pointer.current.fromHandle
+          ) {
+            const point = imagePoint(event.clientX, event.clientY);
+            if (point) onCreateComment(point.x, point.y);
+          }
           dragging.current = false;
         }}
       >
@@ -111,7 +142,7 @@ export function ComparisonSlider({
           />
         </div>
         <div
-          className="pointer-events-none absolute top-0 z-10 h-full w-px bg-white"
+          className="pointer-events-none absolute top-0 z-40 h-full w-px bg-white"
           style={{ left: `${position}%`, boxShadow: "0 0 0 1px rgba(0,0,0,0.25)" }}
         >
           <div
@@ -137,8 +168,8 @@ export function ComparisonSlider({
             commenting={commenting}
             showPopover
             onSelect={onSelectComment}
-            onCreate={onCreateComment}
             onChange={onChangeComment}
+            onSave={onSaveComment}
             onClose={onCloseComment}
           />
         ) : null}

@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { AccessibilityFinding, ComparisonMode, ImageComment, VisionCondition } from "@/lib/types";
+import type { AccessibilityFinding, ImageComment, VisionCondition } from "@/lib/types";
 import { getConditionMeta } from "@/lib/vision/conditions";
-import { ComparisonModeToggle } from "./ComparisonModeToggle";
 import { ComparisonSlider } from "./ComparisonSlider";
-import { SideBySideComparison } from "./SideBySideComparison";
 import { ZoomControls } from "./ZoomControls";
 
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2];
@@ -14,8 +12,6 @@ export function ImageStage({
   original,
   simulated,
   condition,
-  comparisonMode,
-  onComparisonModeChange,
   sliderPosition,
   onSliderPositionChange,
   findings,
@@ -27,13 +23,12 @@ export function ImageStage({
   onSelectComment,
   onCreateComment,
   onChangeComment,
+  onSaveComment,
   onCloseComment,
 }: {
   original: ImageData;
   simulated: ImageData;
   condition: VisionCondition;
-  comparisonMode: ComparisonMode;
-  onComparisonModeChange: (value: ComparisonMode) => void;
   sliderPosition: number;
   onSliderPositionChange: (value: number) => void;
   findings: AccessibilityFinding[];
@@ -45,6 +40,7 @@ export function ImageStage({
   onSelectComment: (id: string) => void;
   onCreateComment: (x: number, y: number) => void;
   onChangeComment: (next: ImageComment) => void;
+  onSaveComment: (next: ImageComment) => void;
   onCloseComment: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -68,7 +64,6 @@ export function ImageStage({
     imageHeight: original.height,
     containerWidth: container.width,
     containerHeight: container.height,
-    comparisonMode,
     zoomMode,
   });
 
@@ -77,10 +72,11 @@ export function ImageStage({
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border)] px-3 py-2">
-        <ComparisonModeToggle value={comparisonMode} onChange={onComparisonModeChange} />
         {commenting ? (
-          <p className="text-[12px] text-[var(--comment)]">Click the image to add an orange comment pin.</p>
-        ) : null}
+          <p className="text-[12px] text-[var(--comment)]">Click the image to add a comment. Drag the divider to compare.</p>
+        ) : (
+          <p className="text-[12px] text-[var(--text-muted)]">Comparison slider</p>
+        )}
         <ZoomControls
           zoomLabel={zoomMode === "fit" ? "Fit" : `${Math.round(numericZoom * 100)}%`}
           onFit={() => setZoomMode("fit")}
@@ -99,47 +95,27 @@ export function ImageStage({
       </div>
       <div ref={containerRef} className="checkerboard min-h-0 flex-1 overflow-auto p-4">
         {display.width > 0 ? (
-          comparisonMode === "side-by-side" ? (
-            <SideBySideComparison
-              original={original}
-              simulated={simulated}
-              originalLabel="Original"
-              simulatedLabel={meta.shortLabel}
-              displayWidth={display.width}
-              displayHeight={display.height}
-              findings={findings}
-              selectedId={selectedId}
-              onSelect={onSelect}
-              comments={comments}
-              selectedCommentId={selectedCommentId}
-              commenting={commenting}
-              onSelectComment={onSelectComment}
-              onCreateComment={onCreateComment}
-              onChangeComment={onChangeComment}
-              onCloseComment={onCloseComment}
-            />
-          ) : (
-            <ComparisonSlider
-              original={original}
-              simulated={simulated}
-              originalLabel="Original"
-              simulatedLabel={meta.shortLabel}
-              position={sliderPosition}
-              onPositionChange={onSliderPositionChange}
-              displayWidth={display.width}
-              displayHeight={display.height}
-              findings={findings}
-              selectedId={selectedId}
-              onSelect={onSelect}
-              comments={comments}
-              selectedCommentId={selectedCommentId}
-              commenting={commenting}
-              onSelectComment={onSelectComment}
-              onCreateComment={onCreateComment}
-              onChangeComment={onChangeComment}
-              onCloseComment={onCloseComment}
-            />
-          )
+          <ComparisonSlider
+            original={original}
+            simulated={simulated}
+            originalLabel="Original"
+            simulatedLabel={meta.shortLabel}
+            position={sliderPosition}
+            onPositionChange={onSliderPositionChange}
+            displayWidth={display.width}
+            displayHeight={display.height}
+            findings={findings}
+            selectedId={selectedId}
+            onSelect={onSelect}
+            comments={comments}
+            selectedCommentId={selectedCommentId}
+            commenting={commenting}
+            onSelectComment={onSelectComment}
+            onCreateComment={onCreateComment}
+            onChangeComment={onChangeComment}
+            onSaveComment={onSaveComment}
+            onCloseComment={onCloseComment}
+          />
         ) : null}
       </div>
     </div>
@@ -151,14 +127,12 @@ function getDisplaySize({
   imageHeight,
   containerWidth,
   containerHeight,
-  comparisonMode,
   zoomMode,
 }: {
   imageWidth: number;
   imageHeight: number;
   containerWidth: number;
   containerHeight: number;
-  comparisonMode: ComparisonMode;
   zoomMode: "fit" | number;
 }): { width: number; height: number; scale: number } {
   if (containerWidth < 40 || containerHeight < 40) {
@@ -175,13 +149,8 @@ function getDisplaySize({
 
   const gutter = 32;
   const caption = 28;
-  const stacked = containerWidth < 768;
   const availableHeight = Math.max(80, containerHeight - gutter - caption);
-  const availableWidth =
-    comparisonMode === "side-by-side" && !stacked
-      ? Math.max(80, (containerWidth - gutter - 16) / 2)
-      : Math.max(80, containerWidth - gutter);
-
+  const availableWidth = Math.max(80, containerWidth - gutter);
   const scale = Math.min(availableWidth / imageWidth, availableHeight / imageHeight);
   return {
     width: Math.max(1, Math.floor(imageWidth * scale)),
